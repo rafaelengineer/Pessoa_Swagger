@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
 
@@ -34,6 +35,32 @@ public class PessoaService{
         else
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    
 
+    public Pessoa Save(Pessoa pessoa)
+    {
+        return _pessoaRepository.save(pessoa);
+    }
+    public ResponseEntity<Pessoa> SeekNReplace(long id, Pessoa newPerson)
+    {
+        Optional<Pessoa> oldPessoa = _pessoaRepository.findById(id);
+        if(oldPessoa.isPresent()){
+            Pessoa pessoa = oldPessoa.get();
+            pessoa.setNome(newPerson.getNome());
+            _pessoaRepository.save(pessoa);
+            return new ResponseEntity<Pessoa>(newPerson, HttpStatus.OK);
+        }
+        else
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    public ResponseEntity<Object> Delete(@PathVariable(value = "id") long id)
+    {
+        Optional<Pessoa> pessoa = _pessoaRepository.findById(id);
+        if(pessoa.isPresent()){
+            _pessoaRepository.delete(pessoa.get());
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }

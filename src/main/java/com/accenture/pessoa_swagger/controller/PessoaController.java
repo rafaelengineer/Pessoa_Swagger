@@ -22,56 +22,38 @@ import com.accenture.pessoa_swagger.sevice.PessoaService;
 @RestController
 public class PessoaController {
     @Autowired
-    private PessoaRepository _pessoaRepository;
+    private PessoaService _pessoaService;
 
     /**
      * @return
      */
     @GetMapping("/pessoas")
-	private List<Pessoa> getAllPessoas() 
+	public List<Pessoa> getAllPessoas() 
 	{
-		return PessoaService.GetAllPeople();
+		return _pessoaService.GetAllPeople();
 	}
 
     @RequestMapping(value = "/pessoa/{id}", method = RequestMethod.GET)
     public ResponseEntity<Pessoa> GetById(@PathVariable(value = "id") long id)
     {
-        Optional<Pessoa> pessoa = _pessoaRepository.findById(id);
-        if(pessoa.isPresent())
-            return new ResponseEntity<Pessoa>(pessoa.get(), HttpStatus.OK);
-        else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return _pessoaService.GetById(id);
     }
 
     @RequestMapping(value = "/pessoa", method =  RequestMethod.POST)
     public Pessoa Post(@Valid @RequestBody Pessoa pessoa)
     {
-        return _pessoaRepository.save(pessoa);
+        return _pessoaService.Save(pessoa);
     }
-
+    
     @RequestMapping(value = "/pessoa/{id}", method =  RequestMethod.PUT)
-    public ResponseEntity<Pessoa> Put(@PathVariable(value = "id") long id, @Valid @RequestBody Pessoa newPessoa)
+    public ResponseEntity<Pessoa> Put(@PathVariable(value = "id") long id, @Valid @RequestBody Pessoa newPerson)
     {
-        Optional<Pessoa> oldPessoa = _pessoaRepository.findById(id);
-        if(oldPessoa.isPresent()){
-            Pessoa pessoa = oldPessoa.get();
-            pessoa.setNome(newPessoa.getNome());
-            _pessoaRepository.save(pessoa);
-            return new ResponseEntity<Pessoa>(pessoa, HttpStatus.OK);
-        }
-        else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       return _pessoaService.SeekNReplace(id, newPerson);
     }
-
+    
     @RequestMapping(value = "/pessoa/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> Delete(@PathVariable(value = "id") long id)
     {
-        Optional<Pessoa> pessoa = _pessoaRepository.findById(id);
-        if(pessoa.isPresent()){
-            _pessoaRepository.delete(pessoa.get());
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return _pessoaService.Delete(id);
     }
 }
